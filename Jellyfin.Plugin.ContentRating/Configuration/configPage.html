@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Content Rating</title>
+</head>
+<body>
+    <div id="contentRatingConfigPage" data-role="page" class="page type-interior pluginConfigurationPage">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="contentRatingConfigForm">
+                    <h2>Configuration du système de notation</h2>
+                    
+                    <div class="inputContainer">
+                        <label for="deleteThreshold">Nombre de votes "à supprimer" requis :</label>
+                        <input type="number" id="deleteThreshold" name="deleteThreshold" min="1" max="10" />
+                        <div class="fieldDescription">Nombre d'utilisateurs qui doivent voter "à supprimer" avant la suppression automatique (défaut: 3)</div>
+                    </div>
+
+                    <div class="checkboxContainer">
+                        <label>
+                            <input type="checkbox" id="autoDeleteEnabled" name="autoDeleteEnabled" />
+                            <span>Activer la suppression automatique</span>
+                        </label>
+                        <div class="fieldDescription">Si désactivé, le contenu sera marqué mais pas supprimé</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label for="minimumWatchPercentage">Pourcentage minimum visionné (%) :</label>
+                        <input type="number" id="minimumWatchPercentage" name="minimumWatchPercentage" min="50" max="100" />
+                        <div class="fieldDescription">Pourcentage minimum du contenu à visionner avant de demander une notation (défaut: 90%)</div>
+                    </div>
+
+                    <div class="checkboxContainer">
+                        <label>
+                            <input type="checkbox" id="notifyOnDelete" name="notifyOnDelete" />
+                            <span>Notifier avant suppression</span>
+                        </label>
+                        <div class="fieldDescription">Envoyer une notification aux administrateurs avant de supprimer du contenu</div>
+                    </div>
+
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block">
+                            <span>Enregistrer</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var ContentRatingConfig = {
+                pluginUniqueId: 'a1b2c3d4-e5f6-4321-8765-fedcba987654'
+            };
+
+            document.getElementById('contentRatingConfigPage').addEventListener('pageshow', function () {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(ContentRatingConfig.pluginUniqueId).then(function (config) {
+                    document.getElementById('deleteThreshold').value = config.DeleteThreshold;
+                    document.getElementById('autoDeleteEnabled').checked = config.AutoDeleteEnabled;
+                    document.getElementById('minimumWatchPercentage').value = config.MinimumWatchPercentage;
+                    document.getElementById('notifyOnDelete').checked = config.NotifyOnDelete;
+                    Dashboard.hideLoadingMsg();
+                });
+            });
+
+            document.getElementById('contentRatingConfigForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                Dashboard.showLoadingMsg();
+
+                ApiClient.getPluginConfiguration(ContentRatingConfig.pluginUniqueId).then(function (config) {
+                    config.DeleteThreshold = parseInt(document.getElementById('deleteThreshold').value);
+                    config.AutoDeleteEnabled = document.getElementById('autoDeleteEnabled').checked;
+                    config.MinimumWatchPercentage = parseInt(document.getElementById('minimumWatchPercentage').value);
+                    config.NotifyOnDelete = document.getElementById('notifyOnDelete').checked;
+
+                    ApiClient.updatePluginConfiguration(ContentRatingConfig.pluginUniqueId, config).then(function () {
+                        Dashboard.processPluginConfigurationUpdateResult();
+                    });
+                });
+
+                return false;
+            });
+        </script>
+    </div>
+</body>
+</html>

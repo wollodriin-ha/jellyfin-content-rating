@@ -1,0 +1,10 @@
+[
+  {
+    "guid": "a1b2c3d4-e5f6-4321-8765-fedcba987654",
+    "name": "Content Rating",
+    "description": "Système de notation utilisateur",
+    "owner": "Jules",
+    "category": "General",
+    "versions": []
+  }
+]
